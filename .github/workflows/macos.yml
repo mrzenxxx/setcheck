@@ -1,0 +1,17 @@
+name: macOS
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  test-and-package:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build dependency
+        run: command -v ffmpeg >/dev/null && command -v ffprobe >/dev/null || brew install ffmpeg
+      - name: Test import, planning, rendering and cancellation
+        run: scripts/test.sh
+      - name: Build native app and installer
+        run: scripts/build-installer.sh
+      # Runtime binaries are validated here but not publicly redistributed.
+      # Public installer releases need a corresponding-source bundle for all runtimes.
